@@ -1,0 +1,38 @@
+[
+  {
+    "cabin_id": "STU-101",
+    "name": "Studio Cabin 101",
+    "type": "STUDIO",
+    "max_guests": 2,
+    "pet_friendly": true,
+    "features": [
+      "deck",
+      "kitchenette",
+      "wifi"
+    ]
+  },
+  {
+    "cabin_id": "FAM-201",
+    "name": "Family Cabin 201",
+    "type": "FAMILY",
+    "max_guests": 4,
+    "pet_friendly": true,
+    "features": [
+      "kitchenette",
+      "wifi",
+      "grill_access"
+    ]
+  },
+  {
+    "cabin_id": "DLX-301",
+    "name": "Lakeview Deluxe 301",
+    "type": "DELUXE",
+    "max_guests": 2,
+    "pet_friendly": false,
+    "features": [
+      "lake_view",
+      "deck",
+      "premium"
+    ]
+  }
+]

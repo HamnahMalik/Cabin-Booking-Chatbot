@@ -1,0 +1,21 @@
+{
+  "STUDIO": {
+    "weekday": 120,
+    "weekend": 150
+  },
+  "FAMILY": {
+    "weekday": 170,
+    "weekend": 210
+  },
+  "DELUXE": {
+    "weekday": 220,
+    "weekend": 270
+  },
+  "fees": {
+    "cleaning": 35,
+    "service": 12,
+    "tax_rate": 0.11
+  },
+  "pet_fee_per_night": 25,
+  "min_nights_weekend": 2
+}
