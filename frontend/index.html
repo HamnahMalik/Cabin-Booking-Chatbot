@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cabin Chatbot Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background:#f6f7fb; }
+    .wrap { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .card { background: white; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,.08); overflow: hidden; }
+    .top { padding: 14px 16px; border-bottom: 1px solid #eee; display:flex; gap:10px; align-items:center; }
+    .top input { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; }
+    .top button { padding: 10px 12px; border: none; border-radius: 10px; background:#111827; color:white; cursor:pointer; }
+    .chat { height: 520px; overflow:auto; padding: 14px; background: #fafafa; }
+    .msg { margin: 10px 0; display:flex; }
+    .bubble { max-width: 78%; padding: 10px 12px; border-radius: 12px; line-height: 1.35; white-space: pre-wrap; }
+    .user { justify-content: flex-end; }
+    .user .bubble { background:#2563eb; color:white; border-bottom-right-radius: 4px; }
+    .bot .bubble { background:white; color:#111; border: 1px solid #eee; border-bottom-left-radius: 4px; }
+    .composer { display:flex; gap:10px; padding: 12px; border-top: 1px solid #eee; background:white; }
+    .composer input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 12px; }
+    .composer button { padding: 12px 14px; border: none; border-radius: 12px; background:#16a34a; color:white; cursor:pointer; }
+    .meta { padding: 10px 12px; background:#fff7ed; border-top: 1px solid #ffe7c2; font-size: 13px; color:#7c2d12; }
+    .row { display:flex; gap:10px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid #eee; background:white; }
+    .row input, .row select { padding: 10px; border: 1px solid #ddd; border-radius: 10px; }
+    .pill { padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 999px; background:white; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <input id="apiUrl" value="https://35c7-136-118-255-239.ngrok-free.app" />
+        <button id="saveApi">Save</button>
+      </div>
+
+      <div class="row">
+        <input id="checkin" type="date" />
+        <input id="checkout" type="date" />
+        <input id="guests" type="number" min="1" value="2" style="width:110px" />
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input id="pets" type="checkbox" /> Pets
+        </label>
+        <select id="cabinType">
+          <option value="">Any cabin</option>
+          <option value="STUDIO">Studio</option>
+          <option value="FAMILY">Family</option>
+          <option value="DELUXE">Deluxe</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <button class="pill" onclick="quickMsg('Do you allow dogs?')">Pets policy</button>
+        <button class="pill" onclick="quickMsg('What is your cancellation policy?')">Cancellation</button>
+        <button class="pill" onclick="quickMsg('Check availability and price')">Availability + price</button>
+        <button class="pill" onclick="quickMsg('¿Cuál es la política de cancelación?')">Español</button>
+      </div>
+
+      <div class="chat" id="chat"></div>
+
+      <div class="composer">
+        <input id="msg" placeholder="Type a message..." />
+        <button id="send">Send</button>
+      </div>
+
+      <div class="meta">
+        Tip: For availability/price, select dates + guests above, then click “Availability + price”.
+      </div>
+    </div>
+  </div>
+
+<script>
+  const chatEl = document.getElementById("chat");
+  const msgEl = document.getElementById("msg");
+  const apiEl = document.getElementById("apiUrl");
+
+  document.getElementById("saveApi").onclick = () => {
+    localStorage.setItem("CABIN_API", apiEl.value.trim());
+    alert("Saved API URL!");
+  };
+
+  // load saved if exists
+  apiEl.value = localStorage.getItem("CABIN_API") || apiEl.value;
+
+  function addMsg(role, text) {
+    const wrap = document.createElement("div");
+    wrap.className = "msg " + (role === "user" ? "user" : "bot");
+    const b = document.createElement("div");
+    b.className = "bubble";
+    b.textContent = text;
+    wrap.appendChild(b);
+    chatEl.appendChild(wrap);
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  function getPayload(message) {
+    const checkin = document.getElementById("checkin").value || null;
+    const checkout = document.getElementById("checkout").value || null;
+    const guests = parseInt(document.getElementById("guests").value || "0", 10) || null;
+    const pets = document.getElementById("pets").checked;
+    const cabin_type = document.getElementById("cabinType").value || null;
+    return { message, checkin, checkout, guests, pets, cabin_type };
+  }
+
+  async function send(message) {
+    const base = (localStorage.getItem("CABIN_API") || "").trim();
+    if (!base) {
+      alert("Paste the API Base URL at the top and click Save.");
+      return;
+    }
+
+    addMsg("user", message);
+    addMsg("bot", "…");
+
+    const payload = getPayload(message);
+
+    try {
+      const res = await fetch(base + "/chat", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      chatEl.lastChild.querySelector(".bubble").textContent = data.reply || JSON.stringify(data);
+    } catch (e) {
+      chatEl.lastChild.querySelector(".bubble").textContent = "Error: " + e.message;
+    }
+  }
+
+  document.getElementById("send").onclick = () => {
+    const text = msgEl.value.trim();
+    if (!text) return;
+    msgEl.value = "";
+    send(text);
+  };
+
+  msgEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("send").click();
+  });
+
+  window.quickMsg = (t) => send(t);
+</script>
+</body>
+</html>
