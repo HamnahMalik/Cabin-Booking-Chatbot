@@ -124,7 +124,13 @@ from pyngrok import ngrok
 public_url = ngrok.connect(8000)
 print(public_url)
 ```
+''''''''''
+### Screenshots
+<img width="904" height="839" alt="Screenshot-3 Conversation" src="https://github.com/user-attachments/assets/614d3775-47aa-4df7-9b00-aa5539d41983" />
+<img width="918" height="828" alt="Screenshot-2 Spanish" src="https://github.com/user-attachments/assets/3ab4e3f6-a255-40cc-a5f8-88cef2cd187c" />
+<img width="902" height="786" alt="Screenshot -1" src="https://github.com/user-attachments/assets/a9a7e020-7d2e-4d2c-ae2d-01148cbf1233" />
 
+---------
 ---
 
 ## Future Improvements
