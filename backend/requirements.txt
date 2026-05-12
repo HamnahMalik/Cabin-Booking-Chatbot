@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+chromadb
+openai
+langdetect
+python-dateutil
+pyngrok
